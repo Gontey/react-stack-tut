@@ -1,6 +1,9 @@
 require('dotenv').config();
-const e = require('express');
 const express = require("express");
+const mongoose = require("mongoose");
+
+//import routes
+const authRoute = require("./routes/auth")
 
 const app = express();
 
@@ -8,7 +11,7 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded());
 
-app.get("/",(req, res)=>{
+app.get("/api",(req, res)=>{
     res.send(`FS react course express server`);
 }) ;
 
@@ -19,6 +22,18 @@ app.post('/name',(req,res)=>{
     return res.json({name: req.body.name});
 });
 
-app.listen(process.env.PORT, ()=>{
-    console.log(`server running on port ${process.env.PORT}`);
+app.use("/api/auth", authRoute);
+
+mongoose
+    .connect(process.env.MONGO_URI)
+    .then(()=> {
+        console.log('connected to db');
+
+        app.listen(process.env.PORT, ()=>{
+            console.log(`server running on port ${process.env.PORT}`);
+        });
+    })
+    .catch((error)=>{
+    console.log(error);
 });
+
